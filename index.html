@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>I have a message!</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#F0F2F5;font-family:Arial,Helvetica,sans-serif;font-size:18px}
+
+.task-discovery{width:100%;padding:30px 0;overflow:hidden;text-align:center;background:#1877F2;font-family:Arial,sans-serif}
+.task-discovery h2{font-size:clamp(23px,4vw,34px);color:#fff;margin:15px 0 38px}
+.ticker{width:100%;overflow:hidden;position:relative;margin:15px 0;
+ -webkit-mask-image:linear-gradient(to right,transparent,black 9%,black 91%,transparent);
+ mask-image:linear-gradient(to right,transparent,black 9%,black 91%,transparent)}
+.ticker-track{display:flex;width:max-content;animation:moveLeft 70s linear infinite}
+.ticker.reverse .ticker-track{animation-name:moveRight;animation-duration:80s}
+.ticker:hover .ticker-track{animation-play-state:paused}
+.task-pill{flex-shrink:0;margin-right:14px;border:none;background:#fff;color:#1877F2;padding:15px 24px;border-radius:50px;font-size:20px;font-weight:700;white-space:nowrap;cursor:pointer;transition:background .2s,transform .2s}
+.task-pill:hover{background:#E7F0FF;transform:scale(1.03)}
+@keyframes moveLeft{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes moveRight{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+@media(prefers-reduced-motion:reduce){.ticker-track{animation:none}}
+
+.gif-tools{max-width:420px;margin:0 auto;padding:20px 16px 40px;text-align:center}
+.gif-tools h3{font-size:24px;color:#1877F2;margin:10px 0}
+.row{display:flex;gap:10px;margin:10px 0}
+select,.btn{flex:1;font:700 20px Arial,sans-serif;padding:14px 10px;border-radius:10px;border:2px solid #1877F2;background:#fff;color:#1877F2}
+.btn{background:#1877F2;color:#fff;cursor:pointer;display:block;text-decoration:none;text-align:center}
+.btn:disabled{opacity:.5}
+.bar{height:12px;background:#D8E6FD;border-radius:6px;overflow:hidden}
+#pg{height:100%;width:0;background:#1877F2}
+#st{font-size:18px;color:#1c1e21;margin:10px 0}
+#out{width:320px;max-width:100%;height:auto;border-radius:10px;display:block;margin:12px auto}
+</style>
+</head>
+<body>
+
+<section class="task-discovery">
+  <h2>I have a message!</h2>
+  <div class="ticker"><div class="ticker-track" id="tickerOne"></div></div>
+  <div class="ticker reverse"><div class="ticker-track" id="tickerTwo"></div></div>
+</section>
+
+<section class="gif-tools">
+  <h3>Output as GIF</h3>
+  <div class="row">
+    <select id="speed" aria-label="Scroll speed">
+      <option value="150">Fast</option>
+      <option value="100" selected>Medium</option>
+      <option value="60">Slow</option>
+    </select>
+    <button class="btn" id="make">Create GIF</button>
+  </div>
+  <div class="bar"><div id="pg"></div></div>
+  <p id="st">Press Create GIF.</p>
+  <div id="res" hidden>
+    <img id="out" alt="Scrolling ticker GIF">
+    <a class="btn" id="dl" download="ticker.gif">Download GIF</a>
+    <p id="tip">If the download does not start, press and hold the GIF and choose Save image.</p>
+  </div>
+</section>
+
+<script>
+var R1=['What’s Chris ministry','all about?','Reaching six million','souls across','six continents','Empowering believers','Building digital','technology','Over 50 applications','deployed'];
+var R2=['Reaching from Nigeria','The gospel of Christ','is all','Chris ministry','taking the lead','If you’re not saved','you’re not safe','The power of','technology'];
+
+/* Live ticker */
+function fill(id,arr){
+  var t=document.getElementById(id);
+  arr.forEach(function(x){var b=document.createElement('button');b.className='task-pill';b.textContent=x;t.appendChild(b)});
+}
+fill('tickerOne',R1);fill('tickerTwo',R2);
+document.querySelectorAll('.ticker-track').forEach(function(t){t.innerHTML+=t.innerHTML});
+document.querySelectorAll('.task-pill').forEach(function(b){
+  b.addEventListener('click',function(){console.log('Selected task:',b.textContent.trim())});
+});
+
+/* GIF export */
+var W=320,H=215,GAP=14,PH=50,BLUE='#1877F2',FONT='bold 20px Arial,Helvetica,sans-serif';
+var cv=document.createElement('canvas');cv.width=W;cv.height=H;
+var c=cv.getContext('2d',{willReadFrequently:true});c.font=FONT;
+function ws(a){return a.map(function(t){return c.measureText(t).width+44})}
+var w1=ws(R1),w2=ws(R2);
+function sum(w){return w.reduce(function(s,v){return s+v+GAP},0)}
+var S1=sum(w1),S2=sum(w2);
+function pill(x,y,w,t){
+  var r=PH/2;c.fillStyle='#fff';c.beginPath();
+  c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+PH,r);c.arcTo(x+w,y+PH,x,y+PH,r);
+  c.arcTo(x,y+PH,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();c.fill();
+  c.fillStyle=BLUE;c.fillText(t,x+22,y+PH/2+1);
+}
+function row(a,w,off,y){
+  var x=off,i=0;
+  while(x<W){var k=i%a.length;if(x+w[k]>0)pill(x,y,w[k],a[k]);x+=w[k]+GAP;i++}
+}
+function frame(f,N){
+  c.fillStyle=BLUE;c.fillRect(0,0,W,H);
+  c.textAlign='center';c.textBaseline='middle';c.fillStyle='#fff';
+  c.font='bold 30px Arial,Helvetica,sans-serif';c.fillText('I have a message!',W/2,32);
+  c.font=FONT;c.textAlign='left';
+  var p=f/N;
+  row(R1,w1,-p*S1,70);
+  row(R2,w2,-S2+p*S2,145);
+  var g=c.createLinearGradient(0,0,40,0);g.addColorStop(0,BLUE);g.addColorStop(1,'rgba(24,119,242,0)');
+  c.fillStyle=g;c.fillRect(0,60,40,H-60);
+  g=c.createLinearGradient(W,0,W-40,0);g.addColorStop(0,BLUE);g.addColorStop(1,'rgba(24,119,242,0)');
+  c.fillStyle=g;c.fillRect(W-40,60,40,H-60);
+}
+function lzw(idx,out){
+  var clear=64,eoi=65,size=7,next=66,dict=new Map(),b=[],cur=0,bits=0;
+  function emit(code){
+    cur|=code<<bits;bits+=size;
+    while(bits>=8){b.push(cur&255);cur>>=8;bits-=8}
+    if(next>(1<<size)-1&&size<12)size++;
+  }
+  emit(clear);
+  var pre=idx[0];
+  for(var i=1;i<idx.length;i++){
+    var k=idx[i],key=(pre<<6)|k,v=dict.get(key);
+    if(v!==undefined){pre=v}
+    else{
+      emit(pre);
+      if(next<4096){dict.set(key,next++)}
+      else{emit(clear);dict.clear();size=7;next=66}
+      pre=k;
+    }
+  }
+  emit(pre);emit(eoi);
+  if(bits>0)b.push(cur&255);
+  out.push(6);
+  for(var j=0;j<b.length;j+=255){var n=Math.min(255,b.length-j);out.push(n);for(var m=0;m<n;m++)out.push(b[j+m])}
+  out.push(0);
+}
+var busy=false;
+async function build(){
+  if(busy)return;busy=true;
+  var sp=+document.getElementById('speed').value;
+  var N=Math.ceil(Math.max(S1,S2)/(sp/16.67));
+  var mk=document.getElementById('make'),st=document.getElementById('st'),pg=document.getElementById('pg');
+  mk.disabled=true;
+  var o=[],i;
+  'GIF89a'.split('').forEach(function(ch){o.push(ch.charCodeAt(0))});
+  o.push(W&255,W>>8,H&255,H>>8,0xF5,0,0);
+  for(i=0;i<64;i++){var t=i/63;o.push(Math.round(255-t*231),Math.round(255-t*136),Math.round(255-t*13))}
+  o.push(0x21,0xFF,0x0B);'NETSCAPE2.0'.split('').forEach(function(ch){o.push(ch.charCodeAt(0))});
+  o.push(3,1,0,0,0);
+  for(var f=0;f<N;f++){
+    frame(f,N);
+    var d=c.getImageData(0,0,W,H).data,idx=new Uint8Array(W*H);
+    for(i=0;i<idx.length;i++){var v=Math.round((255-d[i*4])*63/231);idx[i]=v<0?0:v>63?63:v}
+    o.push(0x21,0xF9,4,0,6,0,0,0);
+    o.push(0x2C,0,0,0,0,W&255,W>>8,H&255,H>>8,0);
+    lzw(idx,o);
+    pg.style.width=((f+1)/N*100)+'%';
+    st.textContent='Building frame '+(f+1)+' of '+N+'…';
+    await new Promise(function(r){setTimeout(r,0)});
+  }
+  o.push(0x3B);
+  var blob=new Blob([new Uint8Array(o)],{type:'image/gif'});
+  var fr=new FileReader();
+  fr.onload=function(){
+    document.getElementById('out').src=fr.result;
+    document.getElementById('dl').href=fr.result;
+    document.getElementById('res').hidden=false;
+    st.textContent='Done — '+(blob.size/1048576).toFixed(2)+' MB.';
+    mk.disabled=false;busy=false;
+  };
+  fr.readAsDataURL(blob);
+}
+document.getElementById('make').addEventListener('click',build);
+</script>
+</body>
+</html>

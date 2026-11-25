@@ -3,172 +3,576 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>I have a message!</title>
+<title>Dr. Don Victor — Message GIF Studio</title>
 <style>
+:root{
+  --bg:#1877F2;--pill-bg:#FFFFFF;--pill-tx:#1877F2;--title:#FFFFFF;--accent:#E7F0FF;
+  --page:#F0F2F5;--card:#FFFFFF;--ink:#1C1E21;--muted:#5B6470;--line:#D8E0EA;
+}
 *{box-sizing:border-box}
-body{margin:0;background:#F0F2F5;font-family:Arial,Helvetica,sans-serif;font-size:18px}
+body{margin:0;background:var(--page);color:var(--ink);font-family:Arial,Helvetica,sans-serif;font-size:17px;line-height:1.45}
 
-.task-discovery{width:100%;padding:30px 0;overflow:hidden;text-align:center;background:#1877F2;font-family:Arial,sans-serif}
-.task-discovery h2{font-size:clamp(23px,4vw,34px);color:#fff;margin:15px 0 38px}
-.ticker{width:100%;overflow:hidden;position:relative;margin:15px 0;
- -webkit-mask-image:linear-gradient(to right,transparent,black 9%,black 91%,transparent);
- mask-image:linear-gradient(to right,transparent,black 9%,black 91%,transparent)}
-.ticker-track{display:flex;width:max-content;animation:moveLeft 70s linear infinite}
-.ticker.reverse .ticker-track{animation-name:moveRight;animation-duration:80s}
+/* Live Preview Stage */
+.stage{width:100%;padding:28px 0 22px;overflow:hidden;text-align:center;background:var(--bg);transition:background .25s}
+.stage h1{font-size:clamp(22px,4.5vw,34px);color:var(--title);margin:0 16px 26px;line-height:1.25}
+.ticker{width:100%;overflow:hidden;position:relative;margin:14px 0;
+  -webkit-mask-image:linear-gradient(to right,transparent,black 8%,black 92%,transparent);
+  mask-image:linear-gradient(to right,transparent,black 8%,black 92%,transparent)}
+.ticker-track{display:flex;width:max-content;animation:moveLeft 55s linear infinite}
+.ticker.reverse .ticker-track{animation-name:moveRight;animation-duration:62s}
 .ticker:hover .ticker-track{animation-play-state:paused}
-.task-pill{flex-shrink:0;margin-right:14px;border:none;background:#fff;color:#1877F2;padding:15px 24px;border-radius:50px;font-size:20px;font-weight:700;white-space:nowrap;cursor:pointer;transition:background .2s,transform .2s}
-.task-pill:hover{background:#E7F0FF;transform:scale(1.03)}
+.pill{flex-shrink:0;margin-right:14px;border:none;background:var(--pill-bg);color:var(--pill-tx);
+  padding:13px 22px;border-radius:999px;font-size:19px;font-weight:700;white-space:nowrap;
+  cursor:pointer;transition:transform .18s,opacity .18s}
+.pill:hover{transform:scale(1.03)}
+.pill:active{transform:scale(.97)}
+.stage-foot{margin:18px 16px 0;font-size:15px;font-weight:700;color:var(--title);opacity:.85;letter-spacing:.3px;min-height:20px}
 @keyframes moveLeft{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @keyframes moveRight{from{transform:translateX(-50%)}to{transform:translateX(0)}}
 @media(prefers-reduced-motion:reduce){.ticker-track{animation:none}}
 
-.gif-tools{max-width:420px;margin:0 auto;padding:20px 16px 40px;text-align:center}
-.gif-tools h3{font-size:24px;color:#1877F2;margin:10px 0}
-.row{display:flex;gap:10px;margin:10px 0}
-select,.btn{flex:1;font:700 20px Arial,sans-serif;padding:14px 10px;border-radius:10px;border:2px solid #1877F2;background:#fff;color:#1877F2}
-.btn{background:#1877F2;color:#fff;cursor:pointer;display:block;text-decoration:none;text-align:center}
-.btn:disabled{opacity:.5}
+/* Studio Controls */
+.wrap{max-width:560px;margin:0 auto;padding:18px 14px 48px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:12px}
+.card h2{margin:0;font-size:19px;color:#0A3F8F}
+.lbl{display:block;font-size:14px;font-weight:700;color:var(--muted);margin-bottom:5px}
+input[type=text],textarea,select{
+  width:100%;font:600 16px Arial,Helvetica,sans-serif;padding:11px 12px;
+  border-radius:10px;border:2px solid var(--line);background:#fff;color:var(--ink)
+}
+textarea{min-height:68px;resize:vertical;line-height:1.4}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#1877F2}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;
+  padding:8px 14px;font:700 14px Arial,sans-serif;cursor:pointer}
+.chip.on{border-color:#0A3F8F;background:#EAF2FF;color:#0A3F8F}
+
+.themes{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.th-btn{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;
+  border:2px solid var(--line);background:#fff;font:700 14px Arial,sans-serif;color:var(--ink);cursor:pointer;text-align:left}
+.th-btn.on{border-color:#0A3F8F;background:#EAF2FF;color:#0A3F8F}
+.swatch{width:24px;height:24px;border-radius:50%;flex-shrink:0;border:2px solid rgba(0,0,0,.15)}
+
+.row{display:flex;gap:10px}
+.row>*{flex:1;min-width:0}
+
+.btn{width:100%;min-height:50px;font:700 17px Arial,sans-serif;padding:12px 14px;border-radius:12px;
+  border:2px solid #0A3F8F;background:#0A3F8F;color:#fff;cursor:pointer;text-decoration:none;
+  display:flex;align-items:center;justify-content:center;text-align:center}
+.btn.sec{background:#fff;color:#0A3F8F}
+.btn.warn{background:#C62828;border-color:#C62828;color:#fff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
 .bar{height:12px;background:#D8E6FD;border-radius:6px;overflow:hidden}
-#pg{height:100%;width:0;background:#1877F2}
-#st{font-size:18px;color:#1c1e21;margin:10px 0}
-#out{width:320px;max-width:100%;height:auto;border-radius:10px;display:block;margin:12px auto}
+#pg{height:100%;width:0;background:#0A3F8F;transition:width .08s linear}
+#st{font-size:15px;color:var(--muted);margin:0;text-align:center}
+#out{max-width:100%;height:auto;border-radius:12px;display:block;margin:4px auto;box-shadow:0 4px 16px rgba(0,0,0,.12)}
+.tip{font-size:14px;color:var(--muted);margin:0;text-align:center}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:999;
+  background:#1C1E21;color:#fff;font:600 15px Arial,sans-serif;padding:11px 20px;
+  border-radius:999px;max-width:90vw;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.28)}
 </style>
 </head>
 <body>
 
-<section class="task-discovery">
-  <h2>Dr. Don Victor Message!</h2>
+<section class="stage" id="stage">
+  <h1 id="liveTitle">Dr. Don Victor Message!</h1>
   <div class="ticker"><div class="ticker-track" id="tickerOne"></div></div>
   <div class="ticker reverse"><div class="ticker-track" id="tickerTwo"></div></div>
+  <p class="stage-foot" id="liveFoot">Dr. Don Victor Ministry</p>
 </section>
 
-<section class="gif-tools">
-  <h3>Output as GIF</h3>
-  <div class="row">
-    <select id="speed" aria-label="Scroll speed">
-      <option value="150">Fast</option>
-      <option value="100" selected>Medium</option>
-      <option value="60">Slow</option>
-    </select>
-    <button class="btn" id="make">Create GIF</button>
-  </div>
-  <div class="bar"><div id="pg"></div></div>
-  <p id="st">Press Create GIF.</p>
-  <div id="res" hidden>
-    <img id="out" alt="Scrolling ticker GIF">
-    <a class="btn" id="dl" download="ticker.gif">Download GIF</a>
-    <p id="tip">If the download does not start, press and hold the GIF and choose Save image.</p>
-  </div>
-</section>
+<main class="wrap">
+
+  <section class="card">
+    <h2>1. Quick Presets</h2>
+    <div class="chips" id="presets"></div>
+  </section>
+
+  <section class="card">
+    <h2>2. Edit Message</h2>
+    <div>
+      <label class="lbl" for="inTitle">Headline</label>
+      <input type="text" id="inTitle" maxlength="70" value="Dr. Don Victor Message!">
+    </div>
+    <div>
+      <label class="lbl" for="inR1">Row 1 Messages (separate with commas)</label>
+      <textarea id="inR1">Why Don Victor ministry?, Six million souls across six continents, Empowering believers, Building digital technology</textarea>
+    </div>
+    <div>
+      <label class="lbl" for="inR2">Row 2 Messages (separate with commas)</label>
+      <textarea id="inR2">Reaching from Nigeria, The Gospel is for all, Taking the lead, If you’re not saved, you’re not safe, Using technology</textarea>
+    </div>
+    <div>
+      <label class="lbl" for="inFoot">Footer / Watermark (optional)</label>
+      <input type="text" id="inFoot" maxlength="50" value="Dr. Don Victor Ministry" placeholder="e.g. Dr. Don Victor Ministry">
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>3. Brand Theme</h2>
+    <div class="themes" id="themes"></div>
+  </section>
+
+  <section class="card">
+    <h2>4. Export GIF</h2>
+    <div class="row">
+      <div>
+        <label class="lbl" for="fmt">Format</label>
+        <select id="fmt">
+          <option value="banner" selected>Banner (16:9)</option>
+          <option value="square">Square (1:1)</option>
+          <option value="status">WhatsApp Status (9:16)</option>
+        </select>
+      </div>
+      <div>
+        <label class="lbl" for="speed">Scroll Speed</label>
+        <select id="speed">
+          <option value="160">Fast</option>
+          <option value="110" selected>Medium</option>
+          <option value="70">Slow</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn" id="make" type="button">Create GIF</button>
+      <button class="btn warn" id="cancel" type="button" hidden>Cancel</button>
+    </div>
+    <div class="bar"><div id="pg"></div></div>
+    <p id="st">Ready. Tap Create GIF.</p>
+
+    <div id="res" hidden style="display:none;flex-direction:column;gap:10px">
+      <img id="out" alt="Generated scrolling ticker GIF">
+      <div class="row">
+        <a class="btn" id="dl" download="don-victor-message.gif">Download GIF</a>
+        <button class="btn sec" id="share" type="button" hidden>Share GIF</button>
+      </div>
+      <p class="tip">If download does not start on mobile, press and hold the GIF above and choose Save image.</p>
+    </div>
+  </section>
+
+</main>
 
 <script>
-var R1=['Why Don Victor ministry?','Six million souls across six continents','Empowering believers','Building digital technology'];
-var R2=['Reaching from Nigeria','The Gospel is for all','Taking the lead','If you’re not saved','you’re not safe','Using technology'];
+(function () {
+  'use strict';
 
-/* Live ticker */
-function fill(id,arr){
-  var t=document.getElementById(id);
-  arr.forEach(function(x){var b=document.createElement('button');b.className='task-pill';b.textContent=x;t.appendChild(b)});
-}
-fill('tickerOne',R1);fill('tickerTwo',R2);
-document.querySelectorAll('.ticker-track').forEach(function(t){t.innerHTML+=t.innerHTML});
-document.querySelectorAll('.task-pill').forEach(function(b){
-  b.addEventListener('click',function(){console.log('Selected task:',b.textContent.trim())});
-});
-
-/* GIF export */
-var W=320,H=215,GAP=14,PH=50,BLUE='#1877F2',FONT='bold 20px Arial,Helvetica,sans-serif';
-var cv=document.createElement('canvas');cv.width=W;cv.height=H;
-var c=cv.getContext('2d',{willReadFrequently:true});c.font=FONT;
-function ws(a){return a.map(function(t){return c.measureText(t).width+44})}
-var w1=ws(R1),w2=ws(R2);
-function sum(w){return w.reduce(function(s,v){return s+v+GAP},0)}
-var S1=sum(w1),S2=sum(w2);
-function pill(x,y,w,t){
-  var r=PH/2;c.fillStyle='#fff';c.beginPath();
-  c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+PH,r);c.arcTo(x+w,y+PH,x,y+PH,r);
-  c.arcTo(x,y+PH,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();c.fill();
-  c.fillStyle=BLUE;c.fillText(t,x+22,y+PH/2+1);
-}
-function row(a,w,off,y){
-  var x=off,i=0;
-  while(x<W){var k=i%a.length;if(x+w[k]>0)pill(x,y,w[k],a[k]);x+=w[k]+GAP;i++}
-}
-function frame(f,N){
-  c.fillStyle=BLUE;c.fillRect(0,0,W,H);
-  c.textAlign='center';c.textBaseline='middle';c.fillStyle='#fff';
-  c.font='bold 30px Arial,Helvetica,sans-serif';c.fillText('I have a message!',W/2,32);
-  c.font=FONT;c.textAlign='left';
-  var p=f/N;
-  row(R1,w1,-p*S1,70);
-  row(R2,w2,-S2+p*S2,145);
-  var g=c.createLinearGradient(0,0,40,0);g.addColorStop(0,BLUE);g.addColorStop(1,'rgba(24,119,242,0)');
-  c.fillStyle=g;c.fillRect(0,60,40,H-60);
-  g=c.createLinearGradient(W,0,W-40,0);g.addColorStop(0,BLUE);g.addColorStop(1,'rgba(24,119,242,0)');
-  c.fillStyle=g;c.fillRect(W-40,60,40,H-60);
-}
-function lzw(idx,out){
-  var clear=64,eoi=65,size=7,next=66,dict=new Map(),b=[],cur=0,bits=0;
-  function emit(code){
-    cur|=code<<bits;bits+=size;
-    while(bits>=8){b.push(cur&255);cur>>=8;bits-=8}
-    if(next>(1<<size)-1&&size<12)size++;
-  }
-  emit(clear);
-  var pre=idx[0];
-  for(var i=1;i<idx.length;i++){
-    var k=idx[i],key=(pre<<6)|k,v=dict.get(key);
-    if(v!==undefined){pre=v}
-    else{
-      emit(pre);
-      if(next<4096){dict.set(key,next++)}
-      else{emit(clear);dict.clear();size=7;next=66}
-      pre=k;
+  var PRESETS = [
+    {
+      name: 'Ministry Vision',
+      title: 'Dr. Don Victor Message!',
+      r1: 'Why Don Victor ministry?, Six million souls across six continents, Empowering believers, Building digital technology',
+      r2: 'Reaching from Nigeria, The Gospel is for all, Taking the lead, If you’re not saved, you’re not safe, Using technology',
+      foot: 'Dr. Don Victor Ministry'
+    },
+    {
+      name: 'Salvation Call',
+      title: 'Jesus Saves Today!',
+      r1: 'If you’re not saved, you’re not safe, Choose eternal life, Grace is free for all',
+      r2: 'Open your heart today, New creation in Christ, Peace beyond understanding, Share the Good News',
+      foot: 'Dr. Don Victor Ministry'
+    },
+    {
+      name: 'New eBook Alert',
+      title: 'Transform Your Life!',
+      r1: 'The Prayer App, Don’t Give Up, Prophesy Your Future, Frame Your World',
+      r2: 'Instant digital access, Spirit-filled teachings, Read on any phone, Order yours today',
+      foot: 'Dr. Don Victor eBook Store'
+    },
+    {
+      name: 'Daily Faith',
+      title: 'Word for Today!',
+      r1: 'Speak life over your future, Prayer changes everything, Walk in dominion, Never give up',
+      r2: 'Faith comes by hearing, God’s promises never fail, Your season of victory, Stay rooted in the Word',
+      foot: 'Dr. Don Victor Ministry'
     }
-  }
-  emit(pre);emit(eoi);
-  if(bits>0)b.push(cur&255);
-  out.push(6);
-  for(var j=0;j<b.length;j+=255){var n=Math.min(255,b.length-j);out.push(n);for(var m=0;m<n;m++)out.push(b[j+m])}
-  out.push(0);
-}
-var busy=false;
-async function build(){
-  if(busy)return;busy=true;
-  var sp=+document.getElementById('speed').value;
-  var N=Math.ceil(Math.max(S1,S2)/(sp/16.67));
-  var mk=document.getElementById('make'),st=document.getElementById('st'),pg=document.getElementById('pg');
-  mk.disabled=true;
-  var o=[],i;
-  'GIF89a'.split('').forEach(function(ch){o.push(ch.charCodeAt(0))});
-  o.push(W&255,W>>8,H&255,H>>8,0xF5,0,0);
-  for(i=0;i<64;i++){var t=i/63;o.push(Math.round(255-t*231),Math.round(255-t*136),Math.round(255-t*13))}
-  o.push(0x21,0xFF,0x0B);'NETSCAPE2.0'.split('').forEach(function(ch){o.push(ch.charCodeAt(0))});
-  o.push(3,1,0,0,0);
-  for(var f=0;f<N;f++){
-    frame(f,N);
-    var d=c.getImageData(0,0,W,H).data,idx=new Uint8Array(W*H);
-    for(i=0;i<idx.length;i++){var v=Math.round((255-d[i*4])*63/231);idx[i]=v<0?0:v>63?63:v}
-    o.push(0x21,0xF9,4,0,6,0,0,0);
-    o.push(0x2C,0,0,0,0,W&255,W>>8,H&255,H>>8,0);
-    lzw(idx,o);
-    pg.style.width=((f+1)/N*100)+'%';
-    st.textContent='Building frame '+(f+1)+' of '+N+'…';
-    await new Promise(function(r){setTimeout(r,0)});
-  }
-  o.push(0x3B);
-  var blob=new Blob([new Uint8Array(o)],{type:'image/gif'});
-  var fr=new FileReader();
-  fr.onload=function(){
-    document.getElementById('out').src=fr.result;
-    document.getElementById('dl').href=fr.result;
-    document.getElementById('res').hidden=false;
-    st.textContent='Done — '+(blob.size/1048576).toFixed(2)+' MB.';
-    mk.disabled=false;busy=false;
+  ];
+
+  var THEMES = [
+    { id: 'royal',   name: 'Royal Blue',   bg: '#1877F2', pillBg: '#FFFFFF', pillTx: '#1877F2', title: '#FFFFFF' },
+    { id: 'navy',    name: 'Navy & Gold',  bg: '#0A3F8F', pillBg: '#FFFFFF', pillTx: '#0A3F8F', title: '#E9B93C' },
+    { id: 'crimson', name: 'Deep Crimson', bg: '#9B1C1C', pillBg: '#FFFFFF', pillTx: '#9B1C1C', title: '#FDE68A' },
+    { id: 'dark',    name: 'Midnight Pro', bg: '#0F172A', pillBg: '#1E293B', pillTx: '#F8FAFC', title: '#38BDF8' }
+  ];
+
+  var FORMATS = {
+    banner: { w: 480, h: 270, titleY: 42, r1Y: 96,  r2Y: 164, footY: 244, titleSz: 28, pillSz: 18, ph: 46 },
+    square: { w: 480, h: 480, titleY: 95, r1Y: 190, r2Y: 270, footY: 428, titleSz: 34, pillSz: 20, ph: 52 },
+    status: { w: 360, h: 640, titleY: 145, r1Y: 270, r2Y: 355, footY: 575, titleSz: 32, pillSz: 19, ph: 50 }
   };
-  fr.readAsDataURL(blob);
-}
-document.getElementById('make').addEventListener('click',build);
+
+  var curTheme = THEMES[0];
+  var $ = function (id) { return document.getElementById(id); };
+
+  function parseList(str) {
+    var arr = str.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+    return arr.length ? arr : ['Add your message'];
+  }
+
+  function toast(msg) {
+    var old = document.querySelector('.toast');
+    if (old) old.remove();
+    var t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 2400);
+  }
+
+  /* ---------- Live Preview ---------- */
+  function fillTrack(el, arr) {
+    el.innerHTML = '';
+    var makeSet = function () {
+      arr.forEach(function (txt) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'pill';
+        b.textContent = txt;
+        b.onclick = function () {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(txt).catch(function () {});
+          }
+          toast('Copied: ' + txt);
+        };
+        el.appendChild(b);
+      });
+    };
+    makeSet();
+    makeSet();
+  }
+
+  function applyTheme(th) {
+    curTheme = th;
+    var r = document.documentElement.style;
+    r.setProperty('--bg', th.bg);
+    r.setProperty('--pill-bg', th.pillBg);
+    r.setProperty('--pill-tx', th.pillTx);
+    r.setProperty('--title', th.title);
+    document.querySelectorAll('.th-btn').forEach(function (b) {
+      b.classList.toggle('on', b.dataset.id === th.id);
+    });
+  }
+
+  function updatePreview() {
+    $('liveTitle').textContent = $('inTitle').value.trim() || 'Message';
+    $('liveFoot').textContent = $('inFoot').value.trim();
+    fillTrack($('tickerOne'), parseList($('inR1').value));
+    fillTrack($('tickerTwo'), parseList($('inR2').value));
+  }
+
+  /* Build Preset & Theme Buttons */
+  PRESETS.forEach(function (p, idx) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip' + (idx === 0 ? ' on' : '');
+    b.textContent = p.name;
+    b.onclick = function () {
+      $('inTitle').value = p.title;
+      $('inR1').value = p.r1;
+      $('inR2').value = p.r2;
+      $('inFoot').value = p.foot;
+      document.querySelectorAll('.chip').forEach(function (c) { c.classList.remove('on'); });
+      b.classList.add('on');
+      updatePreview();
+    };
+    $('presets').appendChild(b);
+  });
+
+  THEMES.forEach(function (th, idx) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'th-btn' + (idx === 0 ? ' on' : '');
+    b.dataset.id = th.id;
+    b.innerHTML = '<span class="swatch" style="background:linear-gradient(135deg,' + th.bg + ' 55%,' + th.title + ' 55%)"></span><span>' + th.name + '</span>';
+    b.onclick = function () { applyTheme(th); };
+    $('themes').appendChild(b);
+  });
+
+  ['inTitle', 'inR1', 'inR2', 'inFoot'].forEach(function (id) {
+    $(id).addEventListener('input', updatePreview);
+  });
+
+  applyTheme(curTheme);
+  updatePreview();
+
+  /* ---------- 64-Color Palette + 5-Bit RGB LUT ---------- */
+  function hexRgb(h) {
+    var n = parseInt(h.slice(1), 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+
+  function buildPalette(th) {
+    var bg = hexRgb(th.bg), pb = hexRgb(th.pillBg), pt = hexRgb(th.pillTx), ti = hexRgb(th.title);
+    var pal = new Uint8Array(64 * 3), idx = 0;
+    function ramp(a, b, steps) {
+      for (var i = 0; i < steps; i++) {
+        var t = steps === 1 ? 0 : i / (steps - 1);
+        pal[idx++] = Math.round(a[0] + (b[0] - a[0]) * t);
+        pal[idx++] = Math.round(a[1] + (b[1] - a[1]) * t);
+        pal[idx++] = Math.round(a[2] + (b[2] - a[2]) * t);
+      }
+    }
+    ramp(bg, pb, 32); // 0..31: background <-> pill fill
+    ramp(bg, ti, 16); // 32..47: background <-> headline/footer
+    ramp(pb, pt, 16); // 48..63: pill fill <-> pill text
+    return pal;
+  }
+
+  function buildLut(pal) {
+    var lut = new Uint8Array(32768);
+    for (var r5 = 0; r5 < 32; r5++) {
+      var r = (r5 << 3) | (r5 >> 2);
+      for (var g5 = 0; g5 < 32; g5++) {
+        var g = (g5 << 3) | (g5 >> 2);
+        for (var b5 = 0; b5 < 32; b5++) {
+          var b = (b5 << 3) | (b5 >> 2);
+          var best = 0, bestD = 1e9;
+          for (var i = 0; i < 64; i++) {
+            var dr = r - pal[i * 3], dg = g - pal[i * 3 + 1], db = b - pal[i * 3 + 2];
+            var d = dr * dr + dg * dg + db * db;
+            if (d < bestD) { bestD = d; best = i; if (d === 0) break; }
+          }
+          lut[(r5 << 10) | (g5 << 5) | b5] = best;
+        }
+      }
+    }
+    return lut;
+  }
+
+  /* ---------- Fast Zero-GC GIF89a LZW Encoder ---------- */
+  var lzwTable = new Int16Array(262144);
+  function lzw(idx, out) {
+    var clear = 64, eoi = 65, size = 7, next = 66;
+    lzwTable.fill(-1);
+    var b = [], cur = 0, bits = 0;
+    function emit(code) {
+      cur |= code << bits;
+      bits += size;
+      while (bits >= 8) { b.push(cur & 255); cur >>= 8; bits -= 8; }
+      if (next > (1 << size) - 1 && size < 12) size++;
+    }
+    emit(clear);
+    var pre = idx[0];
+    for (var i = 1; i < idx.length; i++) {
+      var k = idx[i], key = (pre << 6) | k, v = lzwTable[key];
+      if (v !== -1) { pre = v; }
+      else {
+        emit(pre);
+        if (next < 4096) { lzwTable[key] = next++; }
+        else { emit(clear); lzwTable.fill(-1); size = 7; next = 66; }
+        pre = k;
+      }
+    }
+    emit(pre); emit(eoi);
+    if (bits > 0) b.push(cur & 255);
+    out.push(6);
+    for (var j = 0; j < b.length; j += 255) {
+      var n = Math.min(255, b.length - j);
+      out.push(n);
+      for (var m = 0; m < n; m++) out.push(b[j + m]);
+    }
+    out.push(0);
+  }
+
+  /* ---------- Canvas Renderer ---------- */
+  function wrapTitle(ctx, text, maxW) {
+    var words = text.split(/\s+/), lines = [], line = '';
+    for (var i = 0; i < words.length; i++) {
+      var test = line ? line + ' ' + words[i] : words[i];
+      if (ctx.measureText(test).width > maxW && line) {
+        lines.push(line);
+        line = words[i];
+      } else {
+        line = test;
+      }
+    }
+    if (line) lines.push(line);
+    return lines.slice(0, 2);
+  }
+
+  var busy = false, aborted = false, lastUrl = null, lastFile = null;
+
+  async function buildGif() {
+    if (busy) return;
+    busy = true; aborted = false;
+
+    var cfg = FORMATS[$('fmt').value] || FORMATS.banner;
+    var W = cfg.w, H = cfg.h, PH = cfg.ph, GAP = 14;
+    var R1 = parseList($('inR1').value), R2 = parseList($('inR2').value);
+    var titleTxt = $('inTitle').value.trim() || 'Message';
+    var footTxt = $('inFoot').value.trim();
+    var th = curTheme;
+
+    var cv = document.createElement('canvas');
+    cv.width = W; cv.height = H;
+    var c = cv.getContext('2d', { willReadFrequently: true });
+    var pillFont = 'bold ' + cfg.pillSz + 'px Arial,Helvetica,sans-serif';
+    c.font = pillFont;
+
+    var w1 = R1.map(function (t) { return Math.ceil(c.measureText(t).width) + 42; });
+    var w2 = R2.map(function (t) { return Math.ceil(c.measureText(t).width) + 42; });
+    var S1 = w1.reduce(function (s, v) { return s + v + GAP; }, 0);
+    var S2 = w2.reduce(function (s, v) { return s + v + GAP; }, 0);
+
+    // Balance row speeds while keeping both loops 100% seamless
+    var baseS = Math.max(S1, S2);
+    var m1 = Math.max(1, Math.round(baseS / S1));
+    var m2 = Math.max(1, Math.round(baseS / S2));
+    var sp = +$('speed').value;
+    var delayCs = 7; // 70ms per frame (~14.3 fps)
+    var pxPerFrame = sp * (delayCs / 100);
+    var N = Math.max(24, Math.min(180, Math.round(baseS / pxPerFrame)));
+
+    var mk = $('make'), cn = $('cancel'), st = $('st'), pg = $('pg');
+    mk.disabled = true; cn.hidden = false;
+    pg.style.width = '0%';
+    st.textContent = 'Preparing color palette…';
+    await new Promise(function (r) { setTimeout(r, 10); });
+
+    var pal = buildPalette(th);
+    var lut = buildLut(pal);
+    var bgRgb = hexRgb(th.bg);
+    var bgZero = 'rgba(' + bgRgb[0] + ',' + bgRgb[1] + ',' + bgRgb[2] + ',0)';
+
+    function drawPill(x, y, w, t) {
+      var r = PH / 2;
+      c.fillStyle = th.pillBg;
+      c.beginPath();
+      c.moveTo(x + r, y);
+      c.arcTo(x + w, y, x + w, y + PH, r);
+      c.arcTo(x + w, y + PH, x, y + PH, r);
+      c.arcTo(x, y + PH, x, y, r);
+      c.arcTo(x, y, x + w, y, r);
+      c.closePath();
+      c.fill();
+      c.fillStyle = th.pillTx;
+      c.fillText(t, x + 21, y + PH / 2 + 1);
+    }
+
+    function drawRow(arr, widths, off, y) {
+      var x = off, i = 0;
+      while (x < W) {
+        var k = i % arr.length;
+        if (x + widths[k] > 0) drawPill(x, y, widths[k], arr[k]);
+        x += widths[k] + GAP;
+        i++;
+      }
+    }
+
+    function drawFrame(f) {
+      c.fillStyle = th.bg;
+      c.fillRect(0, 0, W, H);
+
+      // Headline (auto-wrapped up to 2 lines)
+      c.textAlign = 'center';
+      c.textBaseline = 'middle';
+      c.fillStyle = th.title;
+      c.font = 'bold ' + cfg.titleSz + 'px Arial,Helvetica,sans-serif';
+      var lines = wrapTitle(c, titleTxt, W - 36);
+      var lh = cfg.titleSz * 1.22;
+      var startY = cfg.titleY - ((lines.length - 1) * lh) / 2;
+      lines.forEach(function (ln, idx) { c.fillText(ln, W / 2, startY + idx * lh); });
+
+      // Two opposite-direction scrolling rows
+      c.font = pillFont;
+      c.textAlign = 'left';
+      var p = f / N;
+      var off1 = -((p * m1 * S1) % S1);
+      var off2 = -S2 + ((p * m2 * S2) % S2);
+      drawRow(R1, w1, off1, cfg.r1Y);
+      drawRow(R2, w2, off2, cfg.r2Y);
+
+      // Edge fade masks
+      var fadeW = 36;
+      var gL = c.createLinearGradient(0, 0, fadeW, 0);
+      gL.addColorStop(0, th.bg); gL.addColorStop(1, bgZero);
+      c.fillStyle = gL; c.fillRect(0, cfg.r1Y - 6, fadeW, (cfg.r2Y + PH) - cfg.r1Y + 12);
+
+      var gR = c.createLinearGradient(W, 0, W - fadeW, 0);
+      gR.addColorStop(0, th.bg); gR.addColorStop(1, bgZero);
+      c.fillStyle = gR; c.fillRect(W - fadeW, cfg.r1Y - 6, fadeW, (cfg.r2Y + PH) - cfg.r1Y + 12);
+
+      // Optional Footer / Watermark
+      if (footTxt) {
+        c.textAlign = 'center';
+        c.fillStyle = th.title;
+        c.font = 'bold 16px Arial,Helvetica,sans-serif';
+        c.fillText(footTxt, W / 2, cfg.footY);
+      }
+    }
+
+    var o = [];
+    'GIF89a'.split('').forEach(function (ch) { o.push(ch.charCodeAt(0)); });
+    o.push(W & 255, W >> 8, H & 255, H >> 8, 0xF5, 0, 0);
+    for (var pi = 0; pi < pal.length; pi++) o.push(pal[pi]);
+    o.push(0x21, 0xFF, 0x0B);
+    'NETSCAPE2.0'.split('').forEach(function (ch) { o.push(ch.charCodeAt(0)); });
+    o.push(3, 1, 0, 0, 0);
+
+    var idxBuf = new Uint8Array(W * H);
+
+    for (var f = 0; f < N; f++) {
+      if (aborted) {
+        st.textContent = 'Cancelled.';
+        pg.style.width = '0%';
+        mk.disabled = false; cn.hidden = true; busy = false;
+        return;
+      }
+      drawFrame(f);
+      var d = c.getImageData(0, 0, W, H).data;
+      for (var i = 0, p4 = 0; i < idxBuf.length; i++, p4 += 4) {
+        idxBuf[i] = lut[((d[p4] >> 3) << 10) | ((d[p4 + 1] >> 3) << 5) | (d[p4 + 2] >> 3)];
+      }
+      o.push(0x21, 0xF9, 4, 0, delayCs & 255, delayCs >> 8, 0, 0);
+      o.push(0x2C, 0, 0, 0, 0, W & 255, W >> 8, H & 255, H >> 8, 0);
+      lzw(idxBuf, o);
+
+      pg.style.width = (((f + 1) / N) * 100).toFixed(1) + '%';
+      st.textContent = 'Building frame ' + (f + 1) + ' of ' + N + '…';
+      await new Promise(function (r) { setTimeout(r, 0); });
+    }
+
+    o.push(0x3B);
+    var blob = new Blob([new Uint8Array(o)], { type: 'image/gif' });
+    if (lastUrl) URL.revokeObjectURL(lastUrl);
+    lastUrl = URL.createObjectURL(blob);
+
+    var fname = 'don-victor-' + $('fmt').value + '.gif';
+    $('out').src = lastUrl;
+    $('dl').href = lastUrl;
+    $('dl').download = fname;
+
+    var res = $('res');
+    res.hidden = false;
+    res.style.display = 'flex';
+
+    // Enable native mobile Share button if supported
+    lastFile = null;
+    var shBtn = $('share');
+    shBtn.hidden = true;
+    try {
+      var file = new File([blob], fname, { type: 'image/gif' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        lastFile = file;
+        shBtn.hidden = false;
+      }
+    } catch (e) {}
+
+    st.textContent = 'Done — ' + (blob.size / 1048576).toFixed(2) + ' MB (' + W + '×' + H + ', ' + N + ' frames).';
+    mk.disabled = false; cn.hidden = true; busy = false;
+  }
+
+  $('make').addEventListener('click', buildGif);
+  $('cancel').addEventListener('click', function () { aborted = true; });
+  $('share').addEventListener('click', async function () {
+    if (!lastFile) return;
+    try {
+      await navigator.share({ files: [lastFile], title: $('inTitle').value.trim() || 'Message GIF' });
+    } catch (e) {}
+  });
+})();
 </script>
 </body>
 </html>
